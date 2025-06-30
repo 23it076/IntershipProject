@@ -1,0 +1,17 @@
+.experience-card {
+  border: 1px solid #ccc;
+  padding: 15px;
+  width: 300px;
+  border-radius: 8px;
+}
+
+.btn-group {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 10px;
+}
+
+.delete {
+  background-color: red;
+  color: white;
+}

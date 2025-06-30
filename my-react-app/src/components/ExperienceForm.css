@@ -1,0 +1,13 @@
+.experience-form input,
+.experience-form textarea {
+  width: 100%;
+  margin-bottom: 10px;
+  padding: 8px;
+}
+
+.experience-form button {
+  padding: 10px 15px;
+  background-color: #2196F3;
+  color: white;
+  border: none;
+}
