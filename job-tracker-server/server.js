@@ -44,46 +44,46 @@
 require('dotenv').config();
 const express = require('express');
 const mongoose = require('mongoose');
-// const cors = require('cors');
+const cors = require('cors');
 const swaggerDocs = require('./swagger');
 
 const app = express();
 
 // Middleware
-const cors = require('cors');
 app.use(express.json());
 app.use(cors({
   origin: 'http://localhost:5173',
   credentials: true,
 }));
 
-
 // Connect to MongoDB
 mongoose.connect(process.env.MONGO_URI, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
 })
-.then(() => console.log('✅ MongoDB connected'))
-.catch((err) => console.error('❌ MongoDB connection error:', err));
+.then(() => console.log(' MongoDB connected'))
+.catch((err) => console.error(' MongoDB connection error:', err));
 
 // Routes
-const userRoutes = require('./routes/userRoutes');     // Other app routes
-const authRoutes = require('./routes/authRoutes');     // Auth: login + register
+const jobExperienceRoutes = require('./routes/jobExperience'); // ✅ new file after fixing structure
+const userRoutes = require('./routes/userRoutes');
+const authRoutes = require('./routes/authRoutes');
 
 // Mount Routes
+app.use('/api/experience', jobExperienceRoutes);
 app.use('/api/usersForJob', userRoutes);
-app.use('/api/auth', authRoutes);                      // 👈 This enables /api/auth/register and /api/auth/login
+app.use('/api/auth', authRoutes);
 
 // Swagger API docs (optional)
 swaggerDocs(app);
 
 // Health Check
 app.get('/', (req, res) => {
-  res.send('✅ Server is running');
+  res.send(' Server is running');
 });
 
 // Start Server
-const PORT = process.env.PORT || 5000; // Ensure this matches frontend axios base URL
+const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
-  console.log(`🚀 Server listening at http://localhost:${PORT}`);
+  console.log(` Server listening at http://localhost:${PORT}`);
 });
