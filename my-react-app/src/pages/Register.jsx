@@ -1,7 +1,7 @@
  import React, { useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-import API from '../services/api'; // Axios setup
+
 
 const Register = () => {
   const [formData, setFormData] = useState({
@@ -189,3 +189,14 @@ const Register = () => {
 };
 
 export default Register;
+
+
+
+
+
+
+
+
+
+
+

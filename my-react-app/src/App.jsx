@@ -4,6 +4,8 @@ import Dashboard from './pages/Dashboard';
 import LandingPage from "./pages/LandingPage";
 import AddExperience from './pages/AddExperience';
 import EditExperience from './pages/EditExperience';
+import AdminDashboard from "./pages/AdminDashboard"; 
+import ProviderDashboard from "./pages/ProviderDashboard";
 import './App.css';
 import Login from './pages/Login';
 import Register from './pages/Register';
@@ -26,6 +28,8 @@ const App = () => {
         <Route path="/" element={<LandingPage />} />
         <Route path="/register" element={<Register />} />
         <Route path="/login" element={<Login setUser={setUser} />} />
+        <Route path="/admin" element={<AdminDashboard />} />
+        <Route path="/provider" element={<ProviderDashboard />} />
 
         {/* Protected Routes */}
         <Route
@@ -46,3 +50,11 @@ const App = () => {
 };
 
 export default App;
+
+
+
+
+
+
+
+

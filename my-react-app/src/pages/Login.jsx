@@ -1,27 +1,31 @@
-// File: src/pages/Login.js
 import React, { useState } from 'react';
 import axios from 'axios';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
-export default function Login({ setUser }) {
-  const [form, setForm] = useState({ email: '', password: '' });
+const Login = () => {
+  const [formData, setFormData] = useState({
+    email: '',
+    password: ''
+  });
   const navigate = useNavigate();
 
-  const handleChange = (e) =>
-    setForm({ ...form, [e.target.name]: e.target.value });
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const res = await axios.post('http://localhost:5000/api/auth/login', form);
-
+      const res = await axios.post('http://localhost:5000/api/auth/login', formData);
+      
+      // Save token or user info if needed
       localStorage.setItem('token', res.data.token);
-      setUser(res.data.token);
 
-      navigate('/add');
+      alert('Login successful.');
+      navigate('/dashboard'); // redirect based on your app
     } catch (err) {
-      console.error('Login failed:', err.response?.data || err.message);
-      alert('Login failed. Please check your credentials.');
+      alert('Login failed. Check your email and password.');
+      console.error(err);
     }
   };
 
@@ -33,8 +37,7 @@ export default function Login({ setUser }) {
       alignItems: 'center',
       justifyContent: 'center',
       padding: '1rem',
-      fontFamily:
-        '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif'
+      fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif'
     },
     wrapper: {
       width: '100%',
@@ -107,14 +110,6 @@ export default function Login({ setUser }) {
       color: '#667eea',
       textDecoration: 'none',
       fontWeight: '500'
-    },
-    footer: {
-      textAlign: 'center',
-      marginTop: '2rem'
-    },
-    footerText: {
-      fontSize: '0.75rem',
-      color: 'rgba(255, 255, 255, 0.6)'
     }
   };
 
@@ -123,7 +118,7 @@ export default function Login({ setUser }) {
       <div style={styles.wrapper}>
         <div style={styles.header}>
           <h1 style={styles.title}>Welcome Back</h1>
-          <p style={styles.subtitle}>Please sign in to your account</p>
+          <p style={styles.subtitle}>Sign in to your account</p>
         </div>
 
         <div style={styles.formContainer}>
@@ -133,10 +128,12 @@ export default function Login({ setUser }) {
               <input
                 type="email"
                 name="email"
-                value={form.email}
-                onChange={handleChange}
                 placeholder="Enter your email"
+                value={formData.email}
+                onChange={handleChange}
                 style={styles.input}
+                onFocus={(e) => e.target.style.borderColor = '#667eea'}
+                onBlur={(e) => e.target.style.borderColor = '#d1d5db'}
                 required
               />
             </div>
@@ -146,10 +143,12 @@ export default function Login({ setUser }) {
               <input
                 type="password"
                 name="password"
-                value={form.password}
-                onChange={handleChange}
                 placeholder="Enter your password"
+                value={formData.password}
+                onChange={handleChange}
                 style={styles.input}
+                onFocus={(e) => e.target.style.borderColor = '#667eea'}
+                onBlur={(e) => e.target.style.borderColor = '#d1d5db'}
                 required
               />
             </div>
@@ -157,27 +156,23 @@ export default function Login({ setUser }) {
             <button
               type="submit"
               style={styles.button}
-              onMouseOver={(e) => (e.target.style.transform = 'scale(1.02)')}
-              onMouseOut={(e) => (e.target.style.transform = 'scale(1)')}
+              onMouseOver={(e) => e.target.style.transform = 'scale(1.02)'}
+              onMouseOut={(e) => e.target.style.transform = 'scale(1)'}
             >
               Sign In
             </button>
 
             <div style={styles.registerLink}>
               <p>
-                Don&apos;t have an account?{' '}
-                <Link to="/register" style={styles.link}>
-                  Create one here
-                </Link>
+                Don't have an account?{' '}
+                <a href="/register" style={styles.link}>Create one</a>
               </p>
             </div>
           </form>
         </div>
-
-        <div style={styles.footer}>
-          <p style={styles.footerText}>Secure login with end-to-end encryption</p>
-        </div>
       </div>
     </div>
   );
-}
+};
+
+export default Login;
