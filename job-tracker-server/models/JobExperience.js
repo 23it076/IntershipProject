@@ -1,16 +1,17 @@
 const mongoose = require('mongoose');
 
 const JobExperienceSchema = new mongoose.Schema({
-  jobTitle: String,
-  company: String,
-  location: String,
-  startDate: Date,
-  endDate: Date,
-  description: String,
-  isCurrentJob: Boolean,
+  jobTitle: { type: String, required: true },
+  company: { type: String, required: true },
+  location: { type: String },
+  startDate: { type: Date, required: true },
+  endDate: { type: Date },
+  description: { type: String },
+  isCurrentJob: { type: Boolean, default: false },
   userId: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'User'
+    ref: 'User',
+    required: true
   }
 }, { timestamps: true });
 

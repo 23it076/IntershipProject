@@ -1,95 +1,62 @@
-const express = require('express');
-const JobExperience = require('../models/JobExperience');
-const auth = require('../middleware/auth'); // ✅ middleware path fixed
+const express = require("express");
 const router = express.Router();
+const JobExperience = require("../models/JobExperience");
+const authMiddleware = require("../middleware/authMiddleware"); // ✅ now directly function
 
-// GET all experiences
-router.get('/', auth, async (req, res) => {
+// Create Job Experience
+router.post("/", authMiddleware, async (req, res) => {
   try {
-    const experiences = await JobExperience.find({ userId: req.user.id }).sort({ createdAt: -1 });
-    res.json(experiences);
-  } catch (error) {
-    res.status(500).json({ message: 'Server error' });
-  }
-});
-
-// GET single experience
-router.get('/:id', auth, async (req, res) => {
-  try {
-    const experience = await JobExperience.findOne({
-      _id: req.params.id,
-      userId: req.user.id
+    const jobExperience = new JobExperience({
+      ...req.body,
+      user: req.user._id,
     });
-    if (!experience) return res.status(404).json({ message: 'Experience not found' });
-    res.json(experience);
+    await jobExperience.save();
+    res.status(201).json(jobExperience);
   } catch (error) {
-    res.status(500).json({ message: 'Server error' });
+    res.status(400).json({ message: error.message });
   }
 });
 
-// POST create experience
-router.post('/', auth, async (req, res) => {
+// Get All Job Experiences of logged-in user
+router.get("/", authMiddleware, async (req, res) => {
   try {
-    const { jobTitle, company, location, startDate, endDate, description, isCurrentJob } = req.body;
-
-    const experience = new JobExperience({
-      jobTitle,
-      company,
-      location,
-      startDate,
-      endDate: isCurrentJob ? null : endDate,
-      description,
-      isCurrentJob,
-      userId: req.user.id
-    });
-
-    await experience.save();
-    res.status(201).json(experience);
+    const jobExperiences = await JobExperience.find({ user: req.user._id });
+    res.json(jobExperiences);
   } catch (error) {
-    res.status(500).json({ message: 'Server error' });
+    res.status(500).json({ message: error.message });
   }
 });
 
-// PUT update experience
-router.put('/:id', auth, async (req, res) => {
+// Update Job Experience
+router.put("/:id", authMiddleware, async (req, res) => {
   try {
-    const { jobTitle, company, location, startDate, endDate, description, isCurrentJob } = req.body;
-
-    const updateData = {
-      jobTitle,
-      company,
-      location,
-      startDate,
-      endDate: isCurrentJob ? null : endDate,
-      description,
-      isCurrentJob
-    };
-
-    const experience = await JobExperience.findOneAndUpdate(
-      { _id: req.params.id, userId: req.user.id },
-      updateData,
-      { new: true, runValidators: true }
+    const jobExperience = await JobExperience.findOneAndUpdate(
+      { _id: req.params.id, user: req.user._id },
+      req.body,
+      { new: true }
     );
-
-    if (!experience) return res.status(404).json({ message: 'Experience not found' });
-    res.json(experience);
+    if (!jobExperience) {
+      return res.status(404).json({ message: "Job experience not found" });
+    }
+    res.json(jobExperience);
   } catch (error) {
-    res.status(500).json({ message: 'Server error' });
+    res.status(400).json({ message: error.message });
   }
 });
 
-// DELETE experience
-router.delete('/:id', auth, async (req, res) => {
+// Delete Job Experience
+router.delete("/:id", authMiddleware, async (req, res) => {
   try {
-    const experience = await JobExperience.findOneAndDelete({
+    const jobExperience = await JobExperience.findOneAndDelete({
       _id: req.params.id,
-      userId: req.user.id
+      user: req.user._id,
     });
-
-    if (!experience) return res.status(404).json({ message: 'Experience not found' });
-    res.json({ message: 'Experience deleted successfully' });
+    if (!jobExperience) {
+      return res.status(404).json({ message: "Job experience not found" });
+    }
+    res.json({ message: "Job experience deleted" });
   } catch (error) {
-    res.status(500).json({ message: 'Server error' });
+    res.status(500).json({ message: error.message });
   }
 });
 

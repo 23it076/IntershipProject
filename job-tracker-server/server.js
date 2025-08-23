@@ -1,89 +1,57 @@
-// require('dotenv').config();
-// const mongoose = require('mongoose');
-// const express = require('express');
-// const cors = require('cors');
-// const swaggerDocs = require('./swagger');  // Ensure swaggerDocs is available
-
-// const app = express();
-
-// // Middleware
-// app.use(cors());
-// app.use(express.json());
-
-// // API Routes
-// const userRoutes = require('./routes/userRoutes');  // Add this route
-
-// // Connect to MongoDB
-// mongoose.connect(process.env.MONGO_URI, {
-//   useNewUrlParser: true,
-//   useUnifiedTopology: true,
-// })
-//   .then(() => console.log('MongoDB connected'))
-//   .catch((err) => console.error('MongoDB connection error:', err));
-
-// // Register API Routes
-// app.use('/api/usersForJob', userRoutes);  // Register the user routes
-
-// // Swagger Docs - Register after routes to ensure it works properly
-// swaggerDocs(app);
-
-// // Health Check Endpoint
-// app.get('/', (req, res) => {
-//   res.send('Server is running');
-// });
-//  // mounts routes under /auth
-
-// // Start Server
-// const PORT = process.env.PORT || 3000;
-// app.listen(PORT, () => {
-//   console.log(`Server listening on http://localhost:${PORT}`);
-// });
-
-
-// File: server.js
 require('dotenv').config();
-const express = require('express');
 const mongoose = require('mongoose');
+const express = require('express');
 const cors = require('cors');
-const swaggerDocs = require('./swagger');
+const swaggerDocs = require('./swagger');  
 
 const app = express();
 
-// Middleware
+
 app.use(express.json());
-app.use(cors({
-  origin: 'http://localhost:5173',
-  credentials: true,
-}));
+
+// API Routes
+const userRoutes = require('./routes/userRoutes');
+const organizationRoutes = require('./routes/organizationRoutes');
+const authRoutes = require('./routes/authRoutes');  // ✅ add this
+const adminRoutes = require('./routes/adminRoutes'); 
+const providerRoutes = require("./routes/providerRoutes");
 
 // Connect to MongoDB
 mongoose.connect(process.env.MONGO_URI, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
 })
-.then(() => console.log(' MongoDB connected'))
-.catch((err) => console.error(' MongoDB connection error:', err));
+  .then(() => console.log('MongoDB connected'))
+  .catch((err) => console.error('MongoDB connection error:', err));
 
-// Routes
-const jobExperienceRoutes = require('./routes/jobExperience'); // ✅ new file after fixing structure
-const userRoutes = require('./routes/userRoutes');
-const authRoutes = require('./routes/authRoutes');
 
-// Mount Routes
-app.use('/api/experience', jobExperienceRoutes);
+
+  app.use(cors({
+  origin: "http://localhost:5173",  // frontend
+  methods: ["GET", "POST", "PUT", "DELETE"],
+  allowedHeaders: ["Content-Type", "Authorization"],
+  credentials: true
+}));
+
+// Register API Routes
 app.use('/api/usersForJob', userRoutes);
-app.use('/api/auth', authRoutes);
+app.use('/api/organizations', organizationRoutes);
+app.use('/api/auth', authRoutes);   // ✅ register here
+app.use('/api/admin', adminRoutes); 
 
-// Swagger API docs (optional)
+app.use("/api/provider", providerRoutes);
+
+
+// Swagger Docs
 swaggerDocs(app);
 
-// Health Check
+// Health Check Endpoint
 app.get('/', (req, res) => {
-  res.send(' Server is running');
+  res.send('Server is running');
 });
 
 // Start Server
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
-  console.log(` Server listening at http://localhost:${PORT}`);
+  console.log(`Server listening on http://localhost:${PORT}`);
 });

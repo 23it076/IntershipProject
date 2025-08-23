@@ -17,30 +17,41 @@ const options = {
     ],
     components: {
       securitySchemes: {
+        // ✅ JWT Auth Support
+        BearerAuth: {
+          type: 'http',
+          scheme: 'bearer',
+          bearerFormat: 'JWT',
+          description: 'Enter JWT token in the format: Bearer <token>',
+        },
+        // ✅ User Header Support
         UserHeader: {
           type: 'apiKey',
           in: 'header',
-          name: 'user',  // The name of the header (user)
+          name: 'user',
           description: 'Pass the user ID in the request header',
         },
       },
     },
     security: [
       {
+        BearerAuth: [],
+      },
+      {
         UserHeader: [],
       },
     ],
   },
-  apis: ['./routes/*.js'],  // Path to the route files to generate documentation from
+  apis: ['./routes/*.js'], // Path to the route files for documentation
 };
 
 const swaggerSpec = swaggerJSDoc(options);
 
 const swaggerDocs = (app) => {
-  // Serve the Swagger UI docs at /api-docs
+  // Serve Swagger UI docs at /api-docs
   app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
-  // Serve the Swagger spec as JSON at /swagger.json
+  // Serve Swagger spec as JSON at /swagger.json
   app.get('/swagger.json', (req, res) => {
     res.json(swaggerSpec);
   });
