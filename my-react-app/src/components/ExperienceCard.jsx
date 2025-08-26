@@ -211,6 +211,20 @@ const ExperienceCard = ({ experience, onDelete }) => {
         {/* Use jobTitle instead of title */}
         <h3 style={styles.title}>{experience.jobTitle}</h3>
         <p style={styles.company}>{experience.company}</p>
+        {experience.providerStatus && (
+          <span style={{
+            display: 'inline-block',
+            marginTop: 6,
+            padding: '4px 10px',
+            borderRadius: 999,
+            fontSize: 12,
+            fontWeight: 700,
+            background: experience.providerStatus === 'approved' ? '#dcfce7' : experience.providerStatus === 'rejected' ? '#fee2e2' : '#e0e7ff',
+            color: experience.providerStatus === 'approved' ? '#166534' : experience.providerStatus === 'rejected' ? '#991b1b' : '#4338ca'
+          }}>
+            {experience.providerStatus.toUpperCase()}
+          </span>
+        )}
       </div>
       
       <p style={styles.description}>{experience.description}</p>

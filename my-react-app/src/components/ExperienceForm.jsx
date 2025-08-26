@@ -54,28 +54,36 @@ const ExperienceForm = ({ mode, id }) => {
 
   // ✅ Handle form submit
   const handleSubmit = (e) => {
-    e.preventDefault();
-    const submitData = {
-      ...formData,
-      endDate: formData.isCurrentJob ? null : formData.endDate,
-    };
+  e.preventDefault();
 
-    if (mode === "add") {
-      axios
-        .post("http://localhost:5000/api/experience", submitData, axiosConfig)
-        .then(() => navigate("/dashboard"))
-        .catch((err) => console.error("Error adding experience:", err));
-    } else if (mode === "edit") {
-      axios
-        .put(
-          `http://localhost:5000/api/experience/${id}`,
-          submitData,
-          axiosConfig
-        )
-        .then(() => navigate("/dashboard"))
-        .catch((err) => console.error("Error updating experience:", err));
-    }
+  const submitData = {
+    ...formData,
+    startDate: formData.startDate ? new Date(formData.startDate).toISOString() : null,
+    endDate: formData.isCurrentJob
+      ? null
+      : formData.endDate
+      ? new Date(formData.endDate).toISOString()
+      : null,
   };
+
+  console.log("Submitting Data:", submitData); // 🔍 debug
+
+  if (mode === "add") {
+    axios
+      .post("http://localhost:5000/api/experience", submitData, axiosConfig)
+      .then(() => navigate("/dashboard"))
+      .catch((err) =>
+        console.error("Error adding experience:", err.response?.data || err.message)
+      );
+  } else if (mode === "edit") {
+    axios
+      .put(`http://localhost:5000/api/experience/${id}`, submitData, axiosConfig)
+      .then(() => navigate("/dashboard"))
+      .catch((err) =>
+        console.error("Error updating experience:", err.response?.data || err.message)
+      );
+  }
+};
 
   // 🎨 Improved Styles
   const styles = {

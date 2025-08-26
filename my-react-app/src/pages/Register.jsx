@@ -1,15 +1,16 @@
- import React, { useState } from 'react';
-import axios from 'axios';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-
+import { useAuth } from '../context/AuthContext';
 
 const Register = () => {
   const [formData, setFormData] = useState({
     name: '',
     email: '',
-    password: ''
+    password: '',
+    role: 'user'
   });
   const navigate = useNavigate();
+  const { register } = useAuth();
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -18,7 +19,7 @@ const Register = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await axios.post('http://localhost:5000/api/auth/register', formData);
+      await register(formData.name, formData.email, formData.password, formData.role);
       alert('Registration successful. Please login.');
       navigate('/login');
     } catch (err) {
@@ -37,23 +38,10 @@ const Register = () => {
       padding: '1rem',
       fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif'
     },
-    wrapper: {
-      width: '100%',
-      maxWidth: '400px'
-    },
-    header: {
-      textAlign: 'center',
-      marginBottom: '2rem'
-    },
-    title: {
-      fontSize: '2rem',
-      fontWeight: 'bold',
-      color: 'white',
-      marginBottom: '0.5rem'
-    },
-    subtitle: {
-      color: 'rgba(255, 255, 255, 0.8)'
-    },
+    wrapper: { width: '100%', maxWidth: '400px' },
+    header: { textAlign: 'center', marginBottom: '2rem' },
+    title: { fontSize: '2rem', fontWeight: 'bold', color: 'white', marginBottom: '0.5rem' },
+    subtitle: { color: 'rgba(255, 255, 255, 0.8)' },
     formContainer: {
       background: 'rgba(255, 255, 255, 0.95)',
       padding: '2rem',
@@ -61,20 +49,9 @@ const Register = () => {
       boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1)',
       backdropFilter: 'blur(10px)'
     },
-    form: {
-      display: 'flex',
-      flexDirection: 'column'
-    },
-    inputGroup: {
-      marginBottom: '1.5rem'
-    },
-    label: {
-      display: 'block',
-      fontSize: '0.875rem',
-      fontWeight: '500',
-      color: '#374151',
-      marginBottom: '0.5rem'
-    },
+    form: { display: 'flex', flexDirection: 'column' },
+    inputGroup: { marginBottom: '1.5rem' },
+    label: { display: 'block', fontSize: '0.875rem', fontWeight: '500', color: '#374151', marginBottom: '0.5rem' },
     input: {
       width: '100%',
       padding: '0.75rem 1rem',
@@ -99,16 +76,8 @@ const Register = () => {
       transition: 'transform 0.2s',
       marginBottom: '1rem'
     },
-    loginLink: {
-      textAlign: 'center',
-      fontSize: '0.875rem',
-      color: '#6b7280'
-    },
-    link: {
-      color: '#667eea',
-      textDecoration: 'none',
-      fontWeight: '500'
-    }
+    loginLink: { textAlign: 'center', fontSize: '0.875rem', color: '#6b7280' },
+    link: { color: '#667eea', textDecoration: 'none', fontWeight: '500' }
   };
 
   return (
@@ -123,57 +92,29 @@ const Register = () => {
           <form onSubmit={handleSubmit} style={styles.form}>
             <div style={styles.inputGroup}>
               <label style={styles.label}>Full Name</label>
-              <input
-                type="text"
-                name="name"
-                placeholder="Enter your full name"
-                value={formData.name}
-                onChange={handleChange}
-                style={styles.input}
-                onFocus={(e) => e.target.style.borderColor = '#667eea'}
-                onBlur={(e) => e.target.style.borderColor = '#d1d5db'}
-                required
-              />
+              <input type="text" name="name" placeholder="Enter your full name" value={formData.name} onChange={handleChange} style={styles.input} required />
             </div>
 
             <div style={styles.inputGroup}>
               <label style={styles.label}>Email Address</label>
-              <input
-                type="email"
-                name="email"
-                placeholder="Enter your email"
-                value={formData.email}
-                onChange={handleChange}
-                style={styles.input}
-                onFocus={(e) => e.target.style.borderColor = '#667eea'}
-                onBlur={(e) => e.target.style.borderColor = '#d1d5db'}
-                required
-              />
+              <input type="email" name="email" placeholder="Enter your email" value={formData.email} onChange={handleChange} style={styles.input} required />
             </div>
 
             <div style={styles.inputGroup}>
               <label style={styles.label}>Password</label>
-              <input
-                type="password"
-                name="password"
-                placeholder="Create a password"
-                value={formData.password}
-                onChange={handleChange}
-                style={styles.input}
-                onFocus={(e) => e.target.style.borderColor = '#667eea'}
-                onBlur={(e) => e.target.style.borderColor = '#d1d5db'}
-                required
-              />
+              <input type="password" name="password" placeholder="Create a password" value={formData.password} onChange={handleChange} style={styles.input} required />
             </div>
 
-            <button
-              type="submit"
-              style={styles.button}
-              onMouseOver={(e) => e.target.style.transform = 'scale(1.02)'}
-              onMouseOut={(e) => e.target.style.transform = 'scale(1)'}
-            >
-              Create Account
-            </button>
+            <div style={styles.inputGroup}>
+              <label style={styles.label}>Role</label>
+              <select name="role" value={formData.role} onChange={handleChange} style={styles.input}>
+                <option value="user">User</option>
+                <option value="admin">Admin</option>
+                <option value="provider">Provider</option>
+              </select>
+            </div>
+
+            <button type="submit" style={styles.button}>Create Account</button>
 
             <div style={styles.loginLink}>
               <p>
@@ -189,14 +130,3 @@ const Register = () => {
 };
 
 export default Register;
-
-
-
-
-
-
-
-
-
-
-

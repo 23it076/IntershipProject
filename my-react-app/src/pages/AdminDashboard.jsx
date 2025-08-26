@@ -96,39 +96,90 @@
 // File: src/pages/AdminDashboard.jsx
 // File: src/pages/AdminDashboard.jsx
 import React, { useState, useEffect } from "react";
-import axios from "axios";
-import "./AdminDashboard.css"; // ✅ CSS for gradient theme
+import API from "../services/Api";
+import "./admindashboard.css";
 
 export default function AdminDashboard() {
   const [users, setUsers] = useState([]);
+  const [providers, setProviders] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Fetch users (replace with your backend endpoint)
-    axios
-      .get("http://localhost:5000/api/users")
-      .then((res) => setUsers(res.data))
-      .catch((err) => console.error(err));
+    const fetchAll = async () => {
+      try {
+        const [usersRes, providersRes] = await Promise.all([
+          API.get("/usersForJob?role=user"),
+          API.get("/usersForJob?role=provider"),
+        ]);
+        setUsers(usersRes.data || []);
+        setProviders(providersRes.data || []);
+      } catch (e) {
+        console.error("Failed to load lists", e?.response || e);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchAll();
   }, []);
+
+  const deleteAccount = async (id, kind) => {
+    if (!confirm(`Delete this ${kind}? This cannot be undone.`)) return;
+    try {
+      await API.delete(`/usersForJob/${id}`);
+      if (kind === "user") setUsers((prev) => prev.filter((u) => u._id !== id));
+      else setProviders((prev) => prev.filter((u) => u._id !== id));
+    } catch (e) {
+      alert(e?.response?.data?.message || "Delete failed");
+    }
+  };
+
+  if (loading) return <div className="dashboard"><h1 className="dashboard-title">Admin Dashboard</h1><p>Loading...</p></div>;
 
   return (
     <div className="dashboard">
-      {/* Title */}
       <h1 className="dashboard-title">Admin Dashboard</h1>
 
-      {/* Add User Button */}
-      <button className="add-btn">+ Add New User</button>
-
-      {/* Users List */}
+      <h2 className="section-title">Users</h2>
       <div className="experience-list">
         {users.length === 0 ? (
           <p className="empty-text">No users found.</p>
         ) : (
           users.map((user) => (
             <div key={user._id} className="experience-card">
-              <h3>{user.name}</h3>
-              <p>Email: {user.email}</p>
-              <p>Role: {user.role}</p>
-              <button className="delete-btn">Delete</button>
+              <div className="card-header">
+                <div className="avatar">{(user.name || 'U').slice(0,1).toUpperCase()}</div>
+                <div>
+                  <div className="name">{user.name}</div>
+                  <div className="meta">{user.email}</div>
+                </div>
+              </div>
+              <div className="meta">Role: {user.role}</div>
+              <button className="delete-btn" onClick={() => deleteAccount(user._id, "user")}>
+                Delete
+              </button>
+            </div>
+          ))
+        )}
+      </div>
+
+      <h2 className="section-title">Providers</h2>
+      <div className="experience-list">
+        {providers.length === 0 ? (
+          <p className="empty-text">No providers found.</p>
+        ) : (
+          providers.map((prov) => (
+            <div key={prov._id} className="experience-card">
+              <div className="card-header">
+                <div className="avatar">{(prov.name || 'P').slice(0,1).toUpperCase()}</div>
+                <div>
+                  <div className="name">{prov.name}</div>
+                  <div className="meta">{prov.email}</div>
+                </div>
+              </div>
+              <div className="meta">Role: {prov.role}</div>
+              <button className="delete-btn" onClick={() => deleteAccount(prov._id, "provider")}>
+                Delete
+              </button>
             </div>
           ))
         )}

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 
 const Login = () => {
   const [formData, setFormData] = useState({
@@ -8,6 +9,7 @@ const Login = () => {
     password: ''
   });
   const navigate = useNavigate();
+    const { login } = useAuth(); 
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -16,13 +18,19 @@ const Login = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const res = await axios.post('http://localhost:5000/api/auth/login', formData);
+      const loggedInUser = await login(formData.email, formData.password);
       
-      // Save token or user info if needed
-      localStorage.setItem('token', res.data.token);
-
-      alert('Login successful.');
-      navigate('/dashboard'); // redirect based on your app
+      // Redirect based on user role
+      switch (loggedInUser.role) {
+        case 'admin':
+          navigate('/admin');
+          break;
+        case 'provider':
+          navigate('/provider');
+          break;
+        default:
+          navigate('/');
+      }
     } catch (err) {
       alert('Login failed. Check your email and password.');
       console.error(err);
