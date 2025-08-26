@@ -109,10 +109,11 @@ export default function LandingPage() {
               style={{ ...styles.smallBtn, ...styles.ghostSmall }}
               onClick={() => {
                 localStorage.removeItem("token");
+                localStorage.removeItem("user");
                 navigate("/login");
               }}
             >
-              Switch account
+              Logout
             </button>
           </div>
         </div>
@@ -143,26 +144,42 @@ export default function LandingPage() {
         </Carousel>
       </div>
 
-      {/* Action buttons — ALWAYS go to their pages, no token checks here */}
-      <div style={styles.buttonRow}>
-        <button
-          style={{ ...styles.button, ...styles.loginButton }}
-          onClick={() => navigate("/login")}
-          onMouseEnter={(e) => (e.currentTarget.style.transform = "scale(1.05)")}
-          onMouseLeave={(e) => (e.currentTarget.style.transform = "scale(1)")}
-        >
-          Login
-        </button>
-
-        <button
-          style={{ ...styles.button, ...styles.registerButton }}
-          onClick={() => navigate("/register")}
-          onMouseEnter={(e) => (e.currentTarget.style.transform = "scale(1.05)")}
-          onMouseLeave={(e) => (e.currentTarget.style.transform = "scale(1)")}
-        >
-          Register
-        </button>
-      </div>
+      {/* Action buttons: show Login/Register when signed out, Logout when signed in */}
+      {token ? (
+        <div style={styles.buttonRow}>
+          <button
+            style={{ ...styles.button, ...styles.registerButton }}
+            onClick={() => {
+              localStorage.removeItem("token");
+              localStorage.removeItem("user");
+              navigate("/login");
+            }}
+            onMouseEnter={(e) => (e.currentTarget.style.transform = "scale(1.05)")}
+            onMouseLeave={(e) => (e.currentTarget.style.transform = "scale(1)")}
+          >
+            Logout
+          </button>
+        </div>
+      ) : (
+        <div style={styles.buttonRow}>
+          <button
+            style={{ ...styles.button, ...styles.loginButton }}
+            onClick={() => navigate("/login")}
+            onMouseEnter={(e) => (e.currentTarget.style.transform = "scale(1.05)")}
+            onMouseLeave={(e) => (e.currentTarget.style.transform = "scale(1)")}
+          >
+            Login
+          </button>
+          <button
+            style={{ ...styles.button, ...styles.registerButton }}
+            onClick={() => navigate("/register")}
+            onMouseEnter={(e) => (e.currentTarget.style.transform = "scale(1.05)")}
+            onMouseLeave={(e) => (e.currentTarget.style.transform = "scale(1)")}
+          >
+            Register
+          </button>
+        </div>
+      )}
 
       <footer style={styles.footer}>
         © {new Date().getFullYear()} Job Experience Tracker. Secure login with end-to-end encryption
