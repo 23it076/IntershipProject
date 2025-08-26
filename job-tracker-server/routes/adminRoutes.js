@@ -1,27 +1,13 @@
 // routes/adminRoutes.js
 const express = require('express');
-const User = require('../models/User');
-
 const router = express.Router();
 
-// Get all users (admin only)
-router.get('/users', async (req, res) => {
-  try {
-    const users = await User.find().select('-password');
-    res.json(users);
-  } catch (err) {
-    res.status(500).json({ message: "Error fetching users", error: err.message });
-  }
-});
+const { createUserByAdmin } = require('../controllers/adminController');
+const { protect, isAdmin } = require('../middleware/authMiddleware');
 
-// Delete user (admin only)
-router.delete('/users/:id', async (req, res) => {
-  try {
-    await User.findByIdAndDelete(req.params.id);
-    res.json({ message: "User deleted successfully" });
-  } catch (err) {
-    res.status(500).json({ message: "Error deleting user", error: err.message });
-  }
-});
+// Route for an admin to create a new user with a specific role
+// POST /api/admin/create-user
+// This route is protected. It first checks for login (protect), then checks for admin role (isAdmin).
+router.post('/create-user', protect, isAdmin, createUserByAdmin);
 
 module.exports = router;

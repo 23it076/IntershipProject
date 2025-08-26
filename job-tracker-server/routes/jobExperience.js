@@ -1,63 +1,45 @@
+// File: routes/jobExperience.js
+
 const express = require("express");
 const router = express.Router();
-const JobExperience = require("../models/JobExperience");
-const authMiddleware = require("../middleware/authMiddleware"); // ✅ now directly function
 
-// Create Job Experience
-router.post("/", authMiddleware, async (req, res) => {
-  try {
-    const jobExperience = new JobExperience({
-      ...req.body,
-      user: req.user._id,
-    });
-    await jobExperience.save();
-    res.status(201).json(jobExperience);
-  } catch (error) {
-    res.status(400).json({ message: error.message });
-  }
-});
+// 1. Import the controller functions
+const {
+  createJob,
+  getAllJobs,
+  getJobById,
+  updateJob,
+  deleteJob
+} = require('../controllers/jobController'); // Make sure this path is correct
 
-// Get All Job Experiences of logged-in user
-router.get("/", authMiddleware, async (req, res) => {
-  try {
-    const jobExperiences = await JobExperience.find({ user: req.user._id });
-    res.json(jobExperiences);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-});
+// 2. Correctly import and destructure the 'protect' middleware function
+const { protect } = require("../middleware/authMiddleware"); // Make sure this path is correct
 
-// Update Job Experience
-router.put("/:id", authMiddleware, async (req, res) => {
-  try {
-    const jobExperience = await JobExperience.findOneAndUpdate(
-      { _id: req.params.id, user: req.user._id },
-      req.body,
-      { new: true }
-    );
-    if (!jobExperience) {
-      return res.status(404).json({ message: "Job experience not found" });
-    }
-    res.json(jobExperience);
-  } catch (error) {
-    res.status(400).json({ message: error.message });
-  }
-});
+// --- Define the Routes ---
 
-// Delete Job Experience
-router.delete("/:id", authMiddleware, async (req, res) => {
-  try {
-    const jobExperience = await JobExperience.findOneAndDelete({
-      _id: req.params.id,
-      user: req.user._id,
-    });
-    if (!jobExperience) {
-      return res.status(404).json({ message: "Job experience not found" });
-    }
-    res.json({ message: "Job experience deleted" });
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-});
+// @route   GET /api/experience
+// @desc    Get all job experiences for the logged-in user
+// @access  Private
+router.get("/", protect, getAllJobs);
+
+// @route   POST /api/experience
+// @desc    Create a new job experience
+// @access  Private
+router.post("/", protect, createJob);
+
+// @route   GET /api/experience/:id
+// @desc    Get a single job experience by its ID
+// @access  Private
+router.get("/:id", protect, getJobById);
+
+// @route   PUT /api/experience/:id
+// @desc    Update a job experience
+// @access  Private
+router.put("/:id", protect, updateJob);
+
+// @route   DELETE /api/experience/:id  
+// @desc    Delete a job experience
+// @access  Private
+router.delete("/:id", protect, deleteJob);
 
 module.exports = router;
