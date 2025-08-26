@@ -8,7 +8,13 @@ const JobExperienceSchema = new mongoose.Schema({
   endDate: { type: Date },
   description: { type: String },
   isCurrentJob: { type: Boolean, default: false },
-  userId: {
+  // provider review status for user-submitted job
+  providerStatus: { type: String, enum: ['pending', 'approved', 'rejected'], default: 'pending' },
+  // link to mirrored Job document for precise status syncing
+  providerJobId: { type: mongoose.Schema.Types.ObjectId, ref: 'Job' },
+  
+  // ✅ CHANGED THIS FIELD NAME from 'userId' to 'user'
+  user: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
     required: true
